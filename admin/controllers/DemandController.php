@@ -48,6 +48,7 @@ class DemandController extends \bagesoft\common\controllers\admin\Base
         'worker_first_at' => '首次提交',
         'worker_succ_at' => '完成时间',
         'created_at' => '提交需求时间',
+        'retask' => '任务备注',
     ];
 
 
@@ -101,7 +102,7 @@ class DemandController extends \bagesoft\common\controllers\admin\Base
                 'pagination' => $pagination,
                 'datalist' => $datalist,
                 'demand' => $demand,
-                'workers' => UserFunc::getWorkers()
+                'workers' => UserFunc::getWorkers(),
             ]
         );
     }
@@ -171,9 +172,11 @@ class DemandController extends \bagesoft\common\controllers\admin\Base
      */
     public function actionTaskWorkers()
     {   
-        parent::acl('demand/task-workers'); 
+        //parent::acl('demand/task-workers'); 
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $request = Yii::$app->request;
         $demandId = intval($request->post('demandId'));
+        $demand = demand::findOne($demandId);
         // 从 demand_user_map 查询该需求已分配的创作者（角色类型为 worker）
         $workerUids = DemandUserMap::find()
             ->where([
@@ -185,7 +188,8 @@ class DemandController extends \bagesoft\common\controllers\admin\Base
         
         return [
             'success' => true,
-            'workerUids' => $workerUids
+            'workerUids' => $workerUids,
+            'retask' => $demand->retask ?? ''
         ];
     }
     /**
@@ -204,6 +208,7 @@ class DemandController extends \bagesoft\common\controllers\admin\Base
             //$oldWorkerUid = $model->worker_uid;
             //赋值
             $postData = Yii::$app->request->post('Demand', []);
+            $retask = trim($postData['retask'] ?? '');
             $workerUids = isset($postData['worker_uid']) ? array_filter(array_map('intval', $postData['worker_uid'])) : [];
             if (empty($workerUids)) {
                 throw new \Exception('请选择至少一个研究员');
@@ -277,7 +282,7 @@ class DemandController extends \bagesoft\common\controllers\admin\Base
                             'uid' => $model->uid,
                         ]);
             }
-
+            $model->retask = $retask;
             $model->state = ProjectConst::DEMAND_STATUS_WAIT_WORKS;
             $model->worker_accept = ProjectConst::WORKS_ACCEPT_WAIT;
             $model->operator_name = $this->admin->username;

@@ -23,6 +23,7 @@ use bagesoft\functions\CustomerFunc;
 use bagesoft\models\DemandWorks;
 use bagesoft\communication\Dccomm;
 use bagesoft\models\DemandUserMap;
+use bagesoft\models\DemandTask;
 use yii\web\NotFoundHttpException;
 use bagesoft\constant\ProjectConst;
 use bagesoft\constant\MessageQueueConst;
@@ -44,6 +45,7 @@ class DemandController extends \bagesoft\common\controllers\app\Base
         'state' => '状态',
         'produce_num' => '创作次数',
         'created_at' => '入库时间', 
+        'retask' => '任务备注',
     ];
 
     /**
@@ -64,7 +66,8 @@ class DemandController extends \bagesoft\common\controllers\app\Base
 
         $model = DemandUserMap::find()->alias('userMap');
         $model->leftJoin(Demand::tableName() . 'demand', 'userMap.demand_id=demand.id');
-        $model->select('userMap.uid,userMap.role_type ,userMap.demand_id,demand.*');
+        $model->leftJoin(DemandTask::tableName() . 'task','demand.id = task.demand_id AND task.worker_uid = :currentUid',['currentUid' => $uid]);
+        $model->select('userMap.uid,userMap.role_type ,userMap.demand_id,demand.*,task.worker_accept as task_worker_accept,task.worker_uid as task_worker_uid,task.state as task_state,task.worker_name as task_worker_name,task.produce_num as task_produce_num');
         $model->where('userMap.uid=:uid ', ['uid' => $uid]);
         if ($projectName) {
             $model->andWhere(['like', 'demand.project_name', $projectName]);

@@ -260,6 +260,12 @@ $form = ActiveForm::begin([
                     ]
                 ])->label('请选择创作者（可多选）'); ?>
             </div>
+            <div class="col-lg-12">
+                <?php echo $form->field($demand, 'retask')->textarea([
+                    'rows' => 3, 
+                    'placeholder' => '请输入备注信息（选填）'
+                ])->label('备注信息'); ?>
+            </div>
         </div>
     </div>
     <div class="card-footer">
@@ -284,9 +290,14 @@ $(document).ready(function() {
         $.ajax({
             url: '/demand/task-workers', // 新增接口
             type: 'post',
-            data: {demandId: demandId},
+            data: { demandId: demandId },
+            dataType: 'json',
             success: function(data) {
-                console.log(data);
+                if (data.success && data.workerUids.length > 0) {
+                    // 回显已选人员到 Select2
+                    $('#demand-retask').val(data.retask);
+                    $('#demand-worker_uid').val(data.workerUids).trigger('change');
+                }
             }
         });
         $('#demandModal').modal('show');
@@ -312,7 +323,7 @@ $(document).ready(function() {
                         modal: false,
                     });
                     $('#demandModal').modal('hide');
-                    window.location.reload();
+                    //window.location.reload();
                 }
             },
             error: function(xhr, status, error) {

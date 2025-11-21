@@ -158,9 +158,9 @@ $defaultEndDate = date('Y-m-d');
                                                         <?php echo Html::encode($row['project_location']); ?>
                                                     </td>
                                                     <td><?php echo $row['hope_time']; ?></td>
-                                                    <td><?php if ($row['worker_uid']): ?><?php echo Html::encode($row['worker_name']); ?><?php else: ?>-<?php endif; ?>
+                                                    <td><?php if ($row['task_worker_uid']): ?><?php echo Html::encode($row['task_worker_name']); ?><?php else: ?>-<?php endif; ?>
                                                     </td>
-                                                    <td><?php if ($row['deleted'] <= System::DELETE_LEVEL_1): ?><small><?php if ($row['produce_num'] > 0 && $row['produce_num'] <= ProjectConst::DEMAND_STATUS_N): ?><?php echo ProjectConst::DEMAND_WORKS_UPLOAD[$row['produce_num']]; ?>,<?php endif ?><?php echo ProjectConst::DEMAND_STATUS[$row['state']]; ?><br><?php echo ProjectConst::WORKS_STATUS[$row['worker_accept']]; ?><?php else: ?><small
+                                                    <td><?php if ($row['deleted'] <= System::DELETE_LEVEL_1): ?><small><?php if ($row['task_produce_num'] > 0 && $row['task_produce_num'] <= ProjectConst::DEMAND_STATUS_N): ?><?php echo ProjectConst::DEMAND_WORKS_UPLOAD[$row['task_produce_num']]; ?>,<?php endif ?><?php echo ProjectConst::DEMAND_STATUS[$row['task_state']]; ?><br><?php echo ProjectConst::WORKS_STATUS[$row['task_worker_accept']]; ?><?php else: ?><small
                                                                     class="text-danger">删除中</small><?php endif ?></small>
                                                     </td>
                                                     <td><?php echo date('Y-m-d H:i', $row['created_at']); ?>
@@ -176,12 +176,12 @@ $defaultEndDate = date('Y-m-d');
 
                                                                 <?php if ($row['uid'] == $this->context->user->id || $row['partner_uid'] == $this->context->user->id): ?>
                                                                     <!---- 所有者合作伙伴操作按钮 -- 开始-->
-                                                                    <?php if ($row['state'] != ProjectConst::DEMAND_STATUS_SUCCESS && $row['deleted'] <= System::DELETE_LEVEL_1): ?>
+                                                                    <?php if ($row['task_state'] != ProjectConst::DEMAND_STATUS_SUCCESS && $row['deleted'] <= System::DELETE_LEVEL_1): ?>
                                                                         <li><a class="dropdown-item"
                                                                                 href="<?php echo Url::to(['update', 'id' => $row['id']]); ?>"
                                                                                 role="button">编辑</a></li>
                                                                     <?php endif; ?>
-                                                                    <?php if ($row['state'] != ProjectConst::DEMAND_STATUS_SUCCESS && $row['worker_accept'] != ProjectConst::PARTNER_ACCEPT_WAIT && $row['deleted'] == System::DELETE_LEVEL_1): ?>
+                                                                    <?php if ($row['task_state'] != ProjectConst::DEMAND_STATUS_SUCCESS && $row['task_worker_accept'] != ProjectConst::PARTNER_ACCEPT_WAIT && $row['deleted'] == System::DELETE_LEVEL_1): ?>
                                                                         <li> <a class="dropdown-item bg-danger ajaxLink"
                                                                                 data-url="<?php echo Url::to(['delete', 'id' => $row['id']]); ?>"
                                                                                 role="button">删除</a></li>
@@ -190,9 +190,9 @@ $defaultEndDate = date('Y-m-d');
                                                                     <!---- 所有者合作伙伴操作按钮-- 结束 ---->
                                                                 <?php endif ?>
 
-                                                                <?php if ($row['worker_uid'] == $this->context->user->id): ?>
+                                                                <?php if ($row['task_worker_uid'] == $this->context->user->id): ?>
                                                                     <!---- 创作者 -- 开始-->
-                                                                    <?php if ($row['worker_accept'] == ProjectConst::WORKS_ACCEPT_WAIT): ?>
+                                                                    <?php if ($row['task_worker_accept'] == ProjectConst::WORKS_ACCEPT_WAIT): ?>
                                                                         <li> <a class="dropdown-item bg-success ajaxLink"
                                                                                 data-url="<?php echo Url::to(['demand/partner/works-accept', 'id' => $row['id'], 'status' => ProjectConst::WORKS_ACCEPT_APPROVE]); ?>"
                                                                                 role="button" data-message="确定同意创作吗？">接受创作</a></li>
