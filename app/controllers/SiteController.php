@@ -71,7 +71,6 @@ class SiteController extends \bagesoft\common\controllers\app\Base
 
     }
 
-
     public function actionFile()
     {
 
