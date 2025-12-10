@@ -13,6 +13,7 @@ class UserConst
     const WORKER_GID = 3; //产业研究员
     const MANAGER_GID = 5; //项目经理
     const BT_MANAGER_GID = 6; //招投标经理
+    const VICE_MANAGER_GID = 7; //招商总监
 
     const STATUS = [
         self::STATUS_ACTIVE => '正常',

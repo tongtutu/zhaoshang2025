@@ -124,7 +124,25 @@ class UserFunc
         $datalist = self::makeInfo($users);
         return $title + $datalist;
     }
-
+     /**
+     * 获取招商总监
+     *
+     * @param integer $currentUid 当前用户 UID
+     * @return array
+     */
+    public static function getViceManagers($currentUid)
+    {
+        $model = User::find();
+        $model->alias('user');
+        $model->where('user.state=:state AND user.gid=:gid', ['state' => 1, 'gid' => UserConst::VICE_MANAGER_GID]);
+        $model->leftJoin(UserGroup::tableName() . ' group', 'user.gid = group.id');
+        $model->orderBy('user.gid');
+        $users = $model->all();
+        $datalist = [];
+        $title = ['0' => '请选择'];
+        $datalist = self::makeInfo($users);
+        return $title + $datalist;
+    }
     /**
      * 是否需要选择项目经理
      *
@@ -135,6 +153,8 @@ class UserFunc
     {
         if ($gid == UserConst::MANAGER_GID) {
             return 2;
+        } elseif ($gid == UserConst::VICE_MANAGER_GID) {
+            return 3;
         } else {
             return 1;
         }

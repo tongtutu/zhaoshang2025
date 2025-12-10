@@ -66,10 +66,10 @@ class Invest extends \bagesoft\common\models\Base
     public function rules()
     {
         return [
-            [['uid', 'partner_uid', 'project_id', 'project_assess', 'manager_uid', 'bt_manager_uid', 'channel_id', 'steps', 'views', 'is_demand', 'deleted', 'maintain_at', 'updated_at', 'created_at'], 'integer'],
+            [['uid', 'partner_uid', 'project_id', 'project_assess', 'manager_uid', 'vice_manager_uid','bt_manager_uid', 'channel_id', 'steps', 'views', 'is_demand', 'deleted', 'maintain_at', 'updated_at', 'created_at'], 'integer'],
             [['project_name', 'company_name', 'usci_code', 'contact_name', 'contact_phone', 'province', 'address', 'attach_file'], 'required'],
             [['content'], 'string'],
-            [['username', 'partner_name', 'manager_name', 'bt_manager_name', 'usci_code', 'province', 'city', 'area'], 'string', 'max' => 50],
+            [['username', 'partner_name', 'manager_name','vice_manager_name', 'bt_manager_name', 'usci_code', 'province', 'city', 'area'], 'string', 'max' => 50],
             [['project_name', 'company_name'], 'string', 'max' => 100],
             [['channel_name', 'attach_file'], 'string', 'max' => 255],
             [['contact_name'], 'string', 'max' => 20],
@@ -87,6 +87,7 @@ class Invest extends \bagesoft\common\models\Base
             ],
             [
                 'manager_uid',
+                'vice_manager_uid',
                 'compare',
                 'compareValue' => 1,
                 'operator' => '>',
@@ -126,6 +127,8 @@ class Invest extends \bagesoft\common\models\Base
             'project_assess' => '考核项目',
             'manager_uid' => '项目经理',
             'manager_name' => '项目经理姓名',
+            'vice_manager_uid' => '招商总监',
+            'vice_manager_name' => '招商总监姓名',
             'bt_manager_uid' => '招投标经理UID',
             'bt_manager_name' => '招投标经理姓名',
             'company_name' => '公司名称',
@@ -212,6 +215,13 @@ class Invest extends \bagesoft\common\models\Base
             $target->project_id = $this->id;
             $target->role_type = System::MANAGER;
             $target->save();
+            
+            //项目经理
+            $target = new InvestUserMap();
+            $target->uid = intval($this->vice_manager_uid);
+            $target->project_id = $this->id;
+            $target->role_type = System::MANAGER;
+            $target->save();
         }
         //关联项目
         UploadFunc::relateProject($this->attach_file, $this->id);
@@ -231,6 +241,10 @@ class Invest extends \bagesoft\common\models\Base
         $user = User::findOne($this->manager_uid);
         if ($user) {
             $this->manager_name = $user->username;
+        }
+        $vice_user = User::findOne($this->vice_manager_uid);
+        if ($vice_user) {
+            $this->vice_manager_name = $vice_user->username;
         }
         $this->attach_file = str_replace(' ', '', $this->attach_file);
         if (in_array($this->scenario, ['create', 'update'])) {

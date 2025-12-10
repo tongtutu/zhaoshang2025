@@ -173,6 +173,12 @@ class InvestController extends \bagesoft\common\controllers\app\Base
                 }
             }
         }
+        if ($model->vice_manager_uid > 0) {
+            $viceManager = UserFunc::getUserById($model->vice_manager_uid);
+            if ($viceManager) {
+                $model->vice_manager_name = $viceManager->username;
+            }
+        }
         $model->loadDefaultValues();
 
         $model->tags = $model->tags ?: [];

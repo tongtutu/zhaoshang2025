@@ -84,7 +84,7 @@ AppAsset::addScript($this, Yii::$app->params['res.url'] . '/static/plugins/distp
                         </div>
 
                         <div class="row">
-                            <?php if ($hasManager == 1): ?>
+                            <?php if (in_array($hasManager, [1, 3])): ?>
                                 <div class="col-lg-6">
 
                                     <?php echo $form->field($model, 'manager_uid')->widget(Select2::className(), [
@@ -96,11 +96,24 @@ AppAsset::addScript($this, Yii::$app->params['res.url'] . '/static/plugins/distp
                                     ])->label($model->getAttributeLabel('manager_uid') . ' <span class="required-star">*</span>'); ?>
                                 </div>
                             <?php endif; ?>
+                            <?php if ($hasManager == 1): ?>
+                                <div class="col-lg-6">
+
+                                    <?php echo $form->field($model, 'vice_manager_uid')->widget(Select2::className(), [
+                                        'data' => UserFunc::getViceManagers($this->context->user->id),
+                                        'options' => ['placeholder' => '招商总监', 'disabled' => !$model->isNewRecord && $model->vice_manager_uid > 0],
+                                        'pluginOptions' => [
+                                            'allowClear' => true,
+                                        ],
+                                    ])->label($model->getAttributeLabel('vice_manager_uid') . ' <span class="required-star">*</span>'); ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="row">
                             <div class="col-lg-6">
                                 <?php echo $form->field($model, 'project_assess')->dropDownList(['0' => '-'] + TagsFunc::getTagsList(ProjectConst::PROJECT_ASSESS_TAG_ID))->label($model->getAttributeLabel('project_assess')); ?>
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-lg-12">
                                 <?php echo $form->field($model, 'content', [])->widget('bagesoft\widget\ueditor\Ueditor', ['route' => 'uploader/ueditor']); ?>
