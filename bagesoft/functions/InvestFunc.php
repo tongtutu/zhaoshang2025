@@ -7,12 +7,13 @@
  */
 
 namespace bagesoft\functions;
-
+use Yii;
 use bagesoft\constant\System;
 use bagesoft\constant\UserConst;
 use bagesoft\models\Invest;
 use bagesoft\models\InvestExt;
 use bagesoft\models\InvestUserMap;
+use bagesoft\models\InvestTransfer;
 
 class InvestFunc
 {
@@ -137,5 +138,43 @@ class InvestFunc
             $updateData['manager_name'] = '';
         } 
         $result = $project->updateAttributes($updateData);
+         
+        // 如果过户成功，记录过户历史
+        if ($result) {
+            self::recordTransferHistory($project, $newUser);
+        }
+    }
+     
+    /**
+     * 记录过户历史
+     * @param object $project 项目对象
+     * @param object $newUser 新用户对象
+     * @return void
+     */
+    private static function recordTransferHistory($project, $newUser)
+    {
+        $transfer = new InvestTransfer();
+        $transfer->project_id = $project->id;
+             
+        // 获取当前登录用户信息
+        $currentUser = Yii::$app->user->identity;
+        if ($currentUser) {
+            $transfer->operation_uid = $currentUser->id;
+            $transfer->operation_name = $currentUser->username;
+        } else {
+            // 如果没有登录用户，使用默认值
+            $transfer->operation_uid = 0;
+            $transfer->operation_name = '系统';
+        }
+             
+        $transfer->source_uid = $project->getOldAttribute('uid'); // 原用户ID
+        $transfer->source_name = $project->getOldAttribute('username'); // 原用户名
+        $transfer->target_uid = $newUser->id;
+        $transfer->target_name = $newUser->username;
+        $transfer->time = time();
+             
+        if (!$transfer->save()) {
+            \Yii::warning('过户记录保存失败: ' . json_encode($transfer->getErrors()), 'invest.transfer');
+        }
     }
 }

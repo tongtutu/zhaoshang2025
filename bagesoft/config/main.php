@@ -11,6 +11,10 @@ $config = [
     'language' => 'zh-CN',
     //'catchAll' => ['site/upgrade'],
     'components' => [
+        'user' => [
+            'identityClass' => 'bagesoft\models\User',
+            'enableAutoLogin' => true,
+        ],
          'assetManager' => [
             'bundles' => [
                 'yii\web\JqueryAsset' => [

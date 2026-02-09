@@ -166,8 +166,10 @@ class CustomerFunc
             $ower->uid = $newUser->id;
             $ower->save();
         }
-        $project->uid = $newUser->id;
-        $project->username = $newUser->username;
-        $project->save();
+        $updateData = [
+            'uid' => $newUser->id,
+            'username' => $newUser->username,
+        ];
+        $result = $project->updateAttributes($updateData);
     }
 }

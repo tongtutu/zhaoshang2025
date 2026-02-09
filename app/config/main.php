@@ -15,6 +15,10 @@ return [
     'bootstrap' => ['log'],
     'modules' => [],
     'components' => [
+        'user' => [
+            'identityClass' => 'bagesoft\models\User',
+            'enableAutoLogin' => true,
+        ],
         'request' => [
             'csrfParam' => '_csrf-zhaoshang',
         ],
