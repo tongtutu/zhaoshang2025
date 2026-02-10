@@ -102,6 +102,24 @@ $this->params['breadcrumbs'][] = '详情';
                                     <tr>
                                         <td colspan="2"> <?php echo $model->content; ?></td>
                                     </tr>
+                                    <tr>
+                                        <th>项目过户记录</th>
+                                        <td colspan="2"></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2"> <?php if ($transfers): ?>
+                                            <?php foreach ($transfers as $transfer): ?>
+                                               <li>
+                                                    【<?php echo date('Y-m-d H:i:s', $transfer->time); ?>】   该项目由【<?php echo Html::encode($transfer->operation_name); ?>】从【<span style="color:red;"><?php echo Html::encode($transfer->source_name); ?></span>】过户至【<span style="color:green;"><?php echo Html::encode($transfer->target_name); ?></span>】
+                                               </li>
+                                            <?php endforeach; ?>
+                                            <?php else: ?>
+                                                <li>
+                                                    暂无过户记录
+                                                </li>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
 
                                 </tbody>
                             </table>

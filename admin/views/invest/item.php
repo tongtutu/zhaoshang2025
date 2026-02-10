@@ -11,7 +11,8 @@ echo Tabs::widget([
                 'maintain' => $maintain,
                 'maintains' => $maintains,
                 'attachFiles' => $attachFiles,
-                'manager' => $manager
+                'manager' => $manager,
+                'transfers' => $transfers
             ]), // 引用_tab1视图文件的内容
             'active' => true,
         ],

@@ -2,10 +2,6 @@
 
 namespace bagesoft\models;
 
-use bagesoft\functions\TagsFunc;
-use bagesoft\constant\System;
-use bagesoft\functions\UploadFunc;
-use bagesoft\models\CustomerUserMap;
 /**
  * This is the model class for table "{{%invest_transfer}}".
  *
@@ -45,7 +41,17 @@ class InvestTransfer extends \bagesoft\common\models\Base
      */
     public function attributeLabels()
     {
-       
+        return [
+            'id' => '主键',
+            'project_id' => '项目id',
+            'operation_uid' => '操作用户id',
+            'operation_name' => '操作用户名称',
+            'source_uid' => '过户源用户UID',
+            'source_name' => '过户源名称',
+            'target_uid' => '过户目标用户UID',
+            'target_name' => '过户目标用户名称',
+            'time' => '过户时间',
+        ];
     }
 
     /**
@@ -55,11 +61,6 @@ class InvestTransfer extends \bagesoft\common\models\Base
      * @param [type] $changedAttributes
      * @return void
      */
-    public function afterSave($insert, $changedAttributes)
-    {
-        parent::afterSave($insert, $changedAttributes);
-        
-    }
 
     /**
      * 存前操作
@@ -67,10 +68,7 @@ class InvestTransfer extends \bagesoft\common\models\Base
      * @param [type] $insert
      * @return bool
      */
-    public function beforeSave($insert)
-    {
-      
-    }
+
 
     /**
      * 删前操作
@@ -78,8 +76,5 @@ class InvestTransfer extends \bagesoft\common\models\Base
      * @param [type] $insert
      * @param [type] $changedAttributes
      */
-    public function beforeDelete()
-    {
-        
-    }
+   
 }

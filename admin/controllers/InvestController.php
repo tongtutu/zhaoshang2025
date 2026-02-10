@@ -180,6 +180,7 @@ class InvestController extends \bagesoft\common\controllers\admin\Base
                 'attachFiles' => UploadFunc::getlist(System::UPLOAD_SOURCE_INVEST, $model->id),
                 'manager' => UserFunc::getUserById($model->manager_uid),
                 'vice_manager' => UserFunc::getUserById($model->vice_manager_uid),
+                'transfers' => InvestFunc::getTransferList($model->id),
             ]
         );
     }
@@ -221,6 +222,10 @@ class InvestController extends \bagesoft\common\controllers\admin\Base
         try {
             $request = Yii::$app->request;
             $post = $request->post();
+            $operator =[
+                'uid' => $this->session['uid'],
+                'username' => $this->session['username']
+                ];
             $transferId = intval($post['transferId']);
             $newUid = intval($post['Invest']['uid']);
             $model = $this->findModel($transferId);
@@ -230,7 +235,7 @@ class InvestController extends \bagesoft\common\controllers\admin\Base
             } elseif ($newUid->id == $model->uid) {
                 throw new \Exception('不能转移给自己');
             }
-            InvestFunc::transfer($model, $newUser);
+            InvestFunc::transfer($model, $newUser,$operator);
             parent::renderSuccessJson([], '过户完成');
         } catch (\Throwable $th) {
             parent::renderErrorJson($th->getMessage());

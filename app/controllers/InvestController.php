@@ -337,6 +337,7 @@ class InvestController extends \bagesoft\common\controllers\app\Base
                 'attachFiles' => UploadFunc::getlist(System::UPLOAD_SOURCE_INVEST, $model->id),
                 'manager' => UserFunc::getUserById($model->manager_uid),
                 'vice_manager' => UserFunc::getUserById($model->vice_manager_uid),
+                'transfers' => TransferFunc::getTransferListByInvestId($model->id),
             ]
         );
     }

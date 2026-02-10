@@ -7,6 +7,7 @@
  */
 
 namespace bagesoft\functions;
+
 use Yii;
 use bagesoft\constant\System;
 use bagesoft\constant\UserConst;
@@ -107,8 +108,13 @@ class InvestFunc
      * @param object $newUser
      * @return void
      */
-    public static function transfer($project, $newUser)
+    public static function transfer($project, $newUser, $operator = [])
     {
+        $olduser = [
+            'uid' => $project->uid,
+            'username' => $project->username
+        ];
+        
         if ($project->manager_uid == $newUser->id) {
             //如果新用户是当前项目经理，则删除原项目经理的管理关系
             self::mapDestory($project->id, System::MANAGER);
@@ -137,44 +143,55 @@ class InvestFunc
             $updateData['manager_uid'] = 0;
             $updateData['manager_name'] = '';
         } 
+            
         $result = $project->updateAttributes($updateData);
-         
+        
         // 如果过户成功，记录过户历史
         if ($result) {
-            self::recordTransferHistory($project, $newUser);
+            self::recordTransferHistory($project,$olduser, $newUser,$operator);
         }
     }
      
+    /**
+     * 获取过户记录
+     * @param integer $projectId 项目ID
+     * @return array
+     */
+    public static function getTransferList($projectId)
+    {
+        return InvestTransfer::find()
+            ->where('project_id=:project_id', ['project_id' => $projectId])
+            ->orderBy('id DESC')
+            ->all();
+    }
     /**
      * 记录过户历史
      * @param object $project 项目对象
      * @param object $newUser 新用户对象
      * @return void
      */
-    private static function recordTransferHistory($project, $newUser)
+    private static function recordTransferHistory($project,$olduser=[], $newUser, $operator = [])
     {
         $transfer = new InvestTransfer();
         $transfer->project_id = $project->id;
-             
-        // 获取当前登录用户信息
-        $currentUser = Yii::$app->user->identity;
-        if ($currentUser) {
-            $transfer->operation_uid = $currentUser->id;
-            $transfer->operation_name = $currentUser->username;
-        } else {
-            // 如果没有登录用户，使用默认值
-            $transfer->operation_uid = 0;
-            $transfer->operation_name = '系统';
-        }
-             
-        $transfer->source_uid = $project->getOldAttribute('uid'); // 原用户ID
-        $transfer->source_name = $project->getOldAttribute('username'); // 原用户名
+        $transfer->operation_uid = $operator['uid'];
+        $transfer->operation_name = $operator['username'];
+        $transfer->source_uid = $olduser['uid']; // 原用户ID
+        $transfer->source_name = $olduser['username']; // 原用户名
         $transfer->target_uid = $newUser->id;
         $transfer->target_name = $newUser->username;
         $transfer->time = time();
-             
-        if (!$transfer->save()) {
-            \Yii::warning('过户记录保存失败: ' . json_encode($transfer->getErrors()), 'invest.transfer');
+        $saveResult = $transfer->save();
+        if ($saveResult) {
+            Yii::info('过户记录保存成功'. ($saveResult ? '成功' : '失败'), 'invest.transfer');
+        } else {
+            $errors = $transfer->getErrors();
+            $errorMsg = json_encode($errors, JSON_UNESCAPED_UNICODE);
+            Yii::warning('过户记录保存失败: ' . $errorMsg . ' 数据: ' . json_encode($transfer->toArray(), JSON_UNESCAPED_UNICODE), 'invest.transfer');
+            // 额外的调试信息
+            if (empty($errors)) {
+                Yii::warning('模型验证无错误但保存失败，可能原因：数据库连接问题、权限问题等', 'invest.transfer');
+            }
         }
     }
 }
